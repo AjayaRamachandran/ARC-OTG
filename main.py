@@ -14,7 +14,7 @@ pygame.init()
 screenDimensions = (pygame.display.Info().current_w, pygame.display.Info().current_h)
 print(screenDimensions)
 
-windowSize = (480, 270)
+windowSize = (1280, 720)
 
 pygame.display.set_caption("Project HappyStick") # Sets title of window
 screen = pygame.display.set_mode(windowSize, pygame.FULLSCREEN) # Sets the dimensions of the window to the windowSize
@@ -29,6 +29,15 @@ jsm.keylog
 
 fps = 60
 clock = pygame.time.Clock()
+initialTime = time.time()
+
+games = [
+    "Galaga",
+    "Turrican",
+    "Dance Dance Revolution",
+    "Tetris",
+    "Poly Bridge"
+]
 
 ###### FUNCTIONS ######
 
@@ -58,12 +67,19 @@ def drawTestBG():
 running = True # Runs the game loop
 while running:
     screen.fill((10,10,10))
-    pygame.draw.rect(screen, (0, 0, 0), (100, 100, 50, 50))  # Example rectangle
+    pygame.draw.rect(screen, (0, 0, 0), (0, 0, 100, 100))  # Example rectangle
 
+    #drawTestBG()
     jsCoords = jst.giveCoords() # retrieves the input coordinates from the relevant module
 
-    ssCoords = jsToSS(jsCoords) # converts the joystick coordinates into screen space coordinates
-    drawPoint(ssCoords) # draws a red point on the location of the joystick
+    #ssCoords = jsToSS(jsCoords) # converts the joystick coordinates into screen space coordinates
+    #drawPoint(ssCoords) # draws a red point on the location of the joystick
+
+    centerX = 200 + time.time() - initialTime
+    centerY = windowSize[1] / 2
+    for game in games:
+        pygame.draw.rect(screen, (255, 255, 255), (centerX - 150, centerY - 150, 300, 300), 2, border_radius=10)
+        centerX += 320
 
     jsm.updateKeylog()
 
