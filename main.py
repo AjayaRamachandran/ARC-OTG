@@ -31,6 +31,12 @@ fps = 60
 clock = pygame.time.Clock()
 initialTime = time.time()
 
+menuButtons = [
+    "Games",
+    "Stats",
+    "Options"
+]
+
 games = [
     "Galaga",
     "Turrican",
@@ -75,11 +81,21 @@ while running:
     #ssCoords = jsToSS(jsCoords) # converts the joystick coordinates into screen space coordinates
     #drawPoint(ssCoords) # draws a red point on the location of the joystick
 
+    buttonPositions = []
+
     centerX = 200# + (time.time() - initialTime)*50
     centerY = windowSize[1] / 2
-    for game in games:
+    ##### MENULOOP
+    for game in games: # loops through all of the games to draw the boxes
         pygame.draw.rect(screen, (255, 255, 255), (centerX - 150, centerY - 150, 300, 300), 2, border_radius=10)
+        buttonPositions.append((game, (centerX, centerY)))
         centerX += 320
+    
+    centerX = 20
+    for menuButton in menuButtons:
+        pygame.draw.rect(screen, (255, 255, 255), (centerX, windowSize[1] - 90, (windowSize[0] - 40 - 10*(len(menuButtons) - 1)) / len(menuButtons), 70), 2, border_radius=10)
+        buttonPositions.append((menuButton, (centerX, centerY)))
+        centerX += (windowSize[0] - 40 - 10*(len(menuButtons) - 1)) / len(menuButtons) + 10
 
     jsm.updateKeylog()
 
