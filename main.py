@@ -17,7 +17,7 @@ print(screenDimensions)
 windowSize = (1280, 720)
 
 pygame.display.set_caption("Project HappyStick") # Sets title of window
-screen = pygame.display.set_mode(windowSize, pygame.FULLSCREEN) # Sets the dimensions of the window to the windowSize
+screen = pygame.display.set_mode(windowSize)#, pygame.FULLSCREEN) # Sets the dimensions of the window to the windowSize
 icon = pygame.image.load("icon.png")
 pygame.display.set_icon(icon)
 
@@ -30,6 +30,7 @@ jsm.keylog
 fps = 60
 clock = pygame.time.Clock()
 initialTime = time.time()
+oldNews = True
 
 menuButtons = [
     "Games",
@@ -44,6 +45,8 @@ games = [
     "Tetris",
     "Poly Bridge"
 ]
+
+selected = 0
 
 ###### FUNCTIONS ######
 
@@ -77,9 +80,10 @@ while running:
 
     #drawTestBG()
     jsCoords = jst.giveCoords() # retrieves the input coordinates from the relevant module
+    #print(jsCoords)
 
-    #ssCoords = jsToSS(jsCoords) # converts the joystick coordinates into screen space coordinates
-    #drawPoint(ssCoords) # draws a red point on the location of the joystick
+    ssCoords = jsToSS(jsCoords) # converts the joystick coordinates into screen space coordinates
+    drawPoint(ssCoords) # draws a red point on the location of the joystick
 
     buttonPositions = []
 
@@ -92,12 +96,24 @@ while running:
         centerX += 320
     
     centerX = 20
+    centerY = windowSize[1] - 90
     for menuButton in menuButtons:
-        pygame.draw.rect(screen, (255, 255, 255), (centerX, windowSize[1] - 90, (windowSize[0] - 40 - 10*(len(menuButtons) - 1)) / len(menuButtons), 70), 2, border_radius=10)
-        buttonPositions.append((menuButton, (centerX, centerY)))
+        pygame.draw.rect(screen, (255, 255, 255), (centerX, centerY, (windowSize[0] - 40 - 10*(len(menuButtons) - 1)) / len(menuButtons), 70), 2, border_radius=10)
+        buttonPositions.append((menuButton, (centerX + (windowSize[0] - 40 - 10*(len(menuButtons) - 1)) / len(menuButtons) / 2, centerY + 35)))
         centerX += (windowSize[0] - 40 - 10*(len(menuButtons) - 1)) / len(menuButtons) + 10
 
+    for index, object in enumerate(buttonPositions):
+        if index == selected:
+            pygame.draw.circle(screen, (255, 255, 0), object[1], 5) # center of graph point
+
     jsm.updateKeylog()
+
+    if jsm.keylog[-1][0] != "-1" and not oldNews:
+        selected += 1
+        oldNews = True
+
+    if jsm.keylog[-1][0] == "-1":
+        oldNews = False
 
     for event in pygame.event.get(): # checks if program is quit, if so stops the code
         if event.type == pygame.QUIT:

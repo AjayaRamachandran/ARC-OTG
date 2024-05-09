@@ -40,7 +40,7 @@ def updateKeylog():
             elif 225 <= dir((0, 0), jsCoords) < 315 and not keylog[-1][0] == "d": # pointing down
                 keylog.append(["d", time.time()])
                 
-            elif 45 <= dir((0, 0), jsCoords) < 0 or 315 < dir((0, 0), jsCoords) <= 360 and not keylog[-1][0] == "r": # pointing right
+            elif 0 <= dir((0, 0), jsCoords) < 45 or 315 < dir((0, 0), jsCoords) <= 360 and not keylog[-1][0] == "r": # pointing right
                 keylog.append(["r", time.time()])
 
         elif not keylog[-1][0] == "-1":
