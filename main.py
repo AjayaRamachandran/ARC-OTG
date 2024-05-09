@@ -75,7 +75,7 @@ while running:
     #ssCoords = jsToSS(jsCoords) # converts the joystick coordinates into screen space coordinates
     #drawPoint(ssCoords) # draws a red point on the location of the joystick
 
-    centerX = 200 + time.time() - initialTime
+    centerX = 200# + (time.time() - initialTime)*50
     centerY = windowSize[1] / 2
     for game in games:
         pygame.draw.rect(screen, (255, 255, 255), (centerX - 150, centerY - 150, 300, 300), 2, border_radius=10)
