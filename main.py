@@ -119,7 +119,7 @@ while running:
             relativePolarCoords = []
             for index1, object1 in enumerate(buttonPositions):
                 if index1 != index: # ignores the selected button when checking
-                    relativePolarCoords.append((dist(object[1], object1[1]), dir(object[1], object1[1]))) # grabs the distance to and direction to all of the buttons from the hovered button
+                    relativePolarCoords.append((dist(object[1], object1[1]), dir(object[1], object1[1]), index1)) # grabs the distance to and direction to all of the buttons from the hovered button
                     pygame.draw.aaline(screen, (255, 255, 255), object[1], object1[1])
                     #pygame.draw.aaline(screen, (255, 255, 0), object[1], (object[1][0] + 128 * cos(relativePolarCoords[-1][1]), object[1][1] + 128 * sin(relativePolarCoords[-1][1])))
                     
@@ -136,15 +136,22 @@ while running:
             
             for relation in acceptedRelations:
                 pygame.draw.aaline(screen, (255, 255, 0), object[1], (object[1][0] + 128 * cos(relation[1]), object[1][1] + 128 * sin(relation[1])))
-                None
     
     # We have found the branches of all the closest buttons to the selected. Next we need to figure out which one the player is going to based on their js position
 
     jsm.updateKeylog()
 
     if jsm.keylog[-1][0] != "-1" and not oldNews:
-        selected = (selected + 1)*(selected != len(buttonPositions) - 1)
+        #selected = (selected + 1)*(selected != len(buttonPositions) - 1)
         oldNews = True
+        unitMousePos = [-cos(dir((0,0), jsCoords)), sin(dir((0,0), jsCoords))]
+        branchDistances = []
+        for relation in acceptedRelations:
+            branchDistances.append((dist(unitMousePos, (cos(relation[1]), sin(relation[1]))), relation[2]))
+        branchDistances.sort(key = lambda x:x[0])
+
+        if branchDistances[0][0] < 0.5:
+            selected = branchDistances[0][1]
 
     if jsm.keylog[-1][0] == "-1":
         oldNews = False
