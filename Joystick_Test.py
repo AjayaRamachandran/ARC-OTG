@@ -5,7 +5,7 @@ from math import *
 initialTime = time.time()
 
 def giveCoords():
-    if sqrt((pygame.mouse.get_pos()[0] - 640) ** 2 + (pygame.mouse.get_pos()[1] - 360) ** 2) < 100:
+    if sqrt((pygame.mouse.get_pos()[0] - 640) ** 2 + (pygame.mouse.get_pos()[1] - 360) ** 2) < 200:
         return (0, 0)
     else:
         #dir = atan2(pygame.mouse.get_pos()[1] - 360, pygame.mouse.get_pos()[0] - 640)
