@@ -51,6 +51,16 @@ games = [
     "Poly Bridge"
 ]
 
+gamePics = [
+    "images/Game1.png",
+    "images/Game2.png",
+    "images/Game3.png",
+    "images/Game4.png",
+    "images/Game5.png",
+    "images/Game6.png",
+    "images/Game7.png",
+]
+
 selected = 0
 
 ###### OPERATOR FUNCTIONS ######
@@ -105,8 +115,13 @@ while running:
     centerX = 200
     centerY = windowSize[1] / 2
     chaseOffsetX += (rowOffsetX - chaseOffsetX) * 0.05
-    for game in games: # loops through all of the games to draw the boxes
+    for index, game in enumerate(games): # loops through all of the games to draw the boxes
         pygame.draw.rect(screen, (255, 255, 255), (centerX - 150 + chaseOffsetX, centerY - 150, 300, 300), 2, border_radius=10)
+        gameCover = pygame.image.load(gamePics[index])
+        gameCoverRect = (centerX - 150 + chaseOffsetX, centerY - 150, 300, 300)
+        screen.blit(gameCover, gameCoverRect)
+        gameCover = None
+        gameCoverRect = None
         buttonPositions.append((game, (centerX + chaseOffsetX, centerY)))
         centerX += 320
     centerX = 20
