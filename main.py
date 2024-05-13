@@ -61,6 +61,9 @@ gamePics = [
     "images/Game7.png",
 ]
 
+background = pygame.image.load("images/Background.png")
+backgroundRect = background.get_rect()
+
 selected = 0
 
 ###### OPERATOR FUNCTIONS ######
@@ -98,7 +101,8 @@ def drawTestBG():
 
 running = True # Runs the game loop
 while running:
-    screen.fill((10,10,10))
+    #screen.fill((10,10,10))
+    screen.blit(background, backgroundRect)
     #pygame.draw.rect(screen, (0, 0, 0), (0, 0, 100, 100))  # Example rectangle
 
     ### BUTTON LOOPS ###
@@ -106,7 +110,7 @@ while running:
 
     centerX = 200
     centerY = windowSize[1] / 2
-    chaseOffsetX += (rowOffsetX - chaseOffsetX) * 0.05
+    chaseOffsetX += (rowOffsetX - chaseOffsetX) * 0.2
     for index, game in enumerate(games): # loops through all of the games to draw the boxes
         #pygame.draw.rect(screen, (255, 255, 255), (centerX - 152 + chaseOffsetX, centerY - 152, 304, 304), 2, border_radius=10)
         gameCover = pygame.image.load(gamePics[index])
@@ -128,7 +132,7 @@ while running:
     ### BUTTON MANAGEMENT ###
     for index, object in enumerate(buttonPositions):
         if index == selected:
-            if index < len(buttonPositions) - 3:
+            if index < len(buttonPositions) - 4:
                 pygame.draw.rect(screen, (255, 255, 255), (object[1][0] - 152, object[1][1] - 152, 304, 304), 2)
             else:
                 pygame.draw.circle(screen, (255, 255, 0), (object[1][0], object[1][1]), 5) # center of graph point
