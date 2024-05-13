@@ -101,14 +101,6 @@ while running:
     screen.fill((10,10,10))
     #pygame.draw.rect(screen, (0, 0, 0), (0, 0, 100, 100))  # Example rectangle
 
-    #drawTestBG()
-    jsCoords = jst.giveCoords() # retrieves the input coordinates from the relevant module
-    #print(jsCoords)
-
-    ssCoords = jsToSS(jsCoords) # converts the joystick coordinates into screen space coordinates
-    drawPoint(ssCoords) # draws a red point on the location of the joystick
-
-
     ### BUTTON LOOPS ###
     buttonPositions = []
 
@@ -116,7 +108,7 @@ while running:
     centerY = windowSize[1] / 2
     chaseOffsetX += (rowOffsetX - chaseOffsetX) * 0.05
     for index, game in enumerate(games): # loops through all of the games to draw the boxes
-        pygame.draw.rect(screen, (255, 255, 255), (centerX - 150 + chaseOffsetX, centerY - 150, 300, 300), 2, border_radius=10)
+        #pygame.draw.rect(screen, (255, 255, 255), (centerX - 152 + chaseOffsetX, centerY - 152, 304, 304), 2, border_radius=10)
         gameCover = pygame.image.load(gamePics[index])
         gameCoverRect = (centerX - 150 + chaseOffsetX, centerY - 150, 300, 300)
         screen.blit(gameCover, gameCoverRect)
@@ -136,7 +128,10 @@ while running:
     ### BUTTON MANAGEMENT ###
     for index, object in enumerate(buttonPositions):
         if index == selected:
-            pygame.draw.circle(screen, (255, 255, 0), (object[1][0], object[1][1]), 5) # center of graph point
+            if index < len(buttonPositions) - 3:
+                pygame.draw.rect(screen, (255, 255, 255), (object[1][0] - 152, object[1][1] - 152, 304, 304), 2)
+            else:
+                pygame.draw.circle(screen, (255, 255, 0), (object[1][0], object[1][1]), 5) # center of graph point
 
             relativePolarCoords = []
             for index1, object1 in enumerate(buttonPositions):
@@ -162,6 +157,12 @@ while running:
     
     # We have found the branches of all the closest buttons to the selected. Next we need to figure out which one the player is going to based on their js position
 
+    #drawTestBG()
+    jsCoords = jst.giveCoords() # retrieves the input coordinates from the relevant module
+    #print(jsCoords)
+
+    ssCoords = jsToSS(jsCoords) # converts the joystick coordinates into screen space coordinates
+    drawPoint(ssCoords) # draws a red point on the location of the joystick
     jsm.updateKeylog()
 
     if jsm.keylog[-1][0] != "-1" and not oldNews:
