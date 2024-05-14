@@ -101,8 +101,9 @@ def drawTestBG():
 
 running = True # Runs the game loop
 while running:
-    #screen.fill((10,10,10))
-    screen.blit(background, backgroundRect)
+    screen.fill((50,110,60))
+    pygame.draw.rect(screen, (35, 75, 40), (0, 610, 1280, 720))
+    #screen.blit(background, backgroundRect)
     #pygame.draw.rect(screen, (0, 0, 0), (0, 0, 100, 100))  # Example rectangle
 
     ### BUTTON LOOPS ###
