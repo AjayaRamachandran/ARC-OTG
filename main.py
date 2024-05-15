@@ -17,11 +17,11 @@ print(screenDimensions)
 windowSize = (1280, 720)
 
 pygame.display.set_caption("Project HappyStick") # Sets title of window
-screen = pygame.display.set_mode(windowSize)#, pygame.FULLSCREEN) # Sets the dimensions of the window to the windowSize
+screen = pygame.display.set_mode(windowSize, pygame.FULLSCREEN) # Sets the dimensions of the window to the windowSize
 icon = pygame.image.load("icon.png")
 pygame.display.set_icon(icon)
 
-font = pygame.font.Font(None, 36)
+font = pygame.font.Font("fonts/Retro Gaming.ttf", 32)
 
 ###### INITIALIZE ######
 
@@ -32,13 +32,16 @@ clock = pygame.time.Clock()
 
 initialTime = time.time()
 oldNews = True
+clickStatus = False
+oldClickStatus = False
 rowOffsetX = 0
 chaseOffsetX = 0
+currentPage = "GAMES"
 
 menuButtons = [
-    "Games",
-    "Stats",
-    "Options"
+    "GAMES",
+    "STATS",
+    "OPTIONS",
 ]
 
 games = [
@@ -106,7 +109,7 @@ while running:
     #screen.blit(background, backgroundRect)
     #pygame.draw.rect(screen, (0, 0, 0), (0, 0, 100, 100))  # Example rectangle
 
-    ### BUTTON LOOPS ###
+    ### ON-SCREEN BUTTON LOOPS ###
     buttonPositions = []
 
     centerX = 200
@@ -124,8 +127,11 @@ while running:
     centerX = 20
     centerY = windowSize[1] - 90
     for menuButton in menuButtons: # loops through all of the menu buttons to draw the boxes
-        pygame.draw.rect(screen, (255, 255, 255), (centerX, centerY, (windowSize[0] - 40 - 10*(len(menuButtons) - 1)) / len(menuButtons), 70), 2, border_radius=10)
+        pygame.draw.rect(screen, (15, 30, 15), (centerX, centerY, (windowSize[0] - 40 - 10*(len(menuButtons) - 1)) / len(menuButtons), 70))
         buttonPositions.append((menuButton, (centerX + (windowSize[0] - 40 - 10*(len(menuButtons) - 1)) / len(menuButtons) / 2, centerY + 35)))
+        buttonText = font.render(menuButton, False, (255,255,255))
+        buttonTextRect = buttonText.get_rect()
+        screen.blit(buttonText, (centerX + (windowSize[0] - 40 - 10*(len(menuButtons) - 1)) / len(menuButtons) / 2 - buttonTextRect[2]/2, centerY + 35 - buttonTextRect[3]/2))
         centerX += (windowSize[0] - 40 - 10*(len(menuButtons) - 1)) / len(menuButtons) + 10
     pygame.draw.rect(screen, (255, 255, 255), (20, 20, 40, 40), 2, border_radius=10)
     buttonPositions.append((menuButton, (40, 40)))
@@ -135,10 +141,13 @@ while running:
         if index == selected:
             if index < len(buttonPositions) - 4:
                 pygame.draw.rect(screen, (255, 255, 255), (object[1][0] - 152, object[1][1] - 152, 304, 304), 2)
-            else:
+            elif index == len(buttonPositions) - 1:
                 pygame.draw.circle(screen, (255, 255, 0), (object[1][0], object[1][1]), 5) # center of graph point
+            else:
+                pygame.draw.rect(screen, (255, 255, 255), (object[1][0] - ((windowSize[0] - 40 - 10*(len(menuButtons) - 1)) / len(menuButtons) / 2) - 2, object[1][1] - 70/2 - 2, (windowSize[0] - 40 - 10*(len(menuButtons) - 1)) / len(menuButtons) + 4, 74), 2)
 
             relativePolarCoords = []
+            
             for index1, object1 in enumerate(buttonPositions):
                 if index1 != index: # ignores the selected button when checking
                     relativePolarCoords.append((dist(object[1], object1[1]), dir(object[1], object1[1]), index1)) # grabs the distance to and direction to all of the buttons from the hovered button
@@ -148,38 +157,36 @@ while running:
             relativePolarCoords.sort(key = lambda x:x[0])
 
             acceptedRelations = []
-            for relation in relativePolarCoords:
+            for relation in relativePolarCoords: # Looks through all the button relations to determine which are viable options
                 blocked = False
                 for comparator in acceptedRelations:
-                    if dist((cos(relation[1]), sin(relation[1])), (cos(comparator[1]), sin(comparator[1]))) < 0.8:
+                    if dist((cos(relation[1]), sin(relation[1])), (cos(comparator[1]), sin(comparator[1]))) < 0.8: # Makes sure each new button option is sufficiently distanced (directionally) from the others
                         blocked = True
                 if blocked == False:
                     acceptedRelations.append(relation)
-            
-            for relation in acceptedRelations:
-                #pygame.draw.aaline(screen, (255, 255, 0), object[1], (object[1][0] + 128 * cos(relation[1]), object[1][1] + 128 * sin(relation[1])))
-                None
     
     # We have found the branches of all the closest buttons to the selected. Next we need to figure out which one the player is going to based on their js position
 
     #drawTestBG()
     jsCoords = jst.giveCoords() # retrieves the input coordinates from the relevant module
-    #print(jsCoords)
 
     ssCoords = jsToSS(jsCoords) # converts the joystick coordinates into screen space coordinates
     drawPoint(ssCoords) # draws a red point on the location of the joystick
     jsm.updateKeylog()
+    
+    if jst.giveButton() != oldClickStatus and oldClickStatus == False: # detects changes in the click status and makes updates accordingly
+        pygame.draw.circle(screen, (0, 0, 255), (windowSize[0]/2, windowSize[1]/2), 500)
+    clickStatus = jst.giveButton()
 
     if jsm.keylog[-1][0] != "-1" and not oldNews:
-        #selected = (selected + 1)*(selected != len(buttonPositions) - 1)
-        oldNews = True
+        oldNews = True # makes sure the command is only run once per joystick movement
         unitMousePos = [-cos(dir((0,0), jsCoords)), sin(dir((0,0), jsCoords))]
         branchDistances = []
         for relation in acceptedRelations:
             branchDistances.append((dist(unitMousePos, (cos(relation[1]), sin(relation[1]))), relation[2]))
         branchDistances.sort(key = lambda x:x[0])
 
-        if branchDistances[0][0] < 0.5:
+        if branchDistances[0][0] < 0.5: # makes sure that even if a specific button is the "closest", that it is within a certain threshold of the joystick direction
             selected = branchDistances[0][1]
         
         if buttonPositions[selected][1][0] > windowSize[0] - 200 and selected < len(buttonPositions) - 4:
@@ -195,11 +202,12 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             running = False
+    
+    oldClickStatus = clickStatus
     # runs framerate wait time
     clock.tick(fps)
     # update the screen
     pygame.display.update()
     #time.sleep(1)
-
 # quit Pygame
 pygame.quit()
