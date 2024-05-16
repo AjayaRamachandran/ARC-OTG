@@ -3,6 +3,7 @@ import time
 from math import *
 
 initialTime = time.time()
+windowSize = (1024, 600)
 
 def giveCoords():
     if sqrt((pygame.mouse.get_pos()[0] - 640) ** 2 + (pygame.mouse.get_pos()[1] - 360) ** 2) < 200:
