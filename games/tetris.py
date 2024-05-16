@@ -1,9 +1,55 @@
+###### IMPORT ######
 import pygame
 
+###### INITIALIZE ######
 width, height = 1024, 600
 fps = 60
 clock = pygame.time.Clock()
 
+shapes = [
+    [
+        "..0.",
+        "..0.",
+        "..0.",
+        "..0.",
+    ],
+    [
+        "00",
+        "00"
+    ],
+    [
+        ".0.",
+        ".0.",
+        "00."
+    ],
+    [
+        ".0.",
+        ".0.",
+        ".00"
+    ],
+    [
+        ".0.",
+        ".00",
+        "..0"
+    ],
+    [
+        "..0",
+        ".00",
+        ".0."
+    ],
+    [
+        ".0.",
+        ".00",
+        ".0."
+    ]
+]
+
+###### OPERATOR FUNCTIONS ######
+def rotate(matrix):
+    return list(zip(*matrix[::-1]))
+
+
+###### MAINLOOP ######      
 def run(screen):
 
     running = True
@@ -12,11 +58,20 @@ def run(screen):
 
         horizontalTiles = 10
         verticalTiles = 20
-        tileSize = 40
+        board = []
+        [board.append("..........") for row in range(verticalTiles)]
+        tileSize = 20
 
-        boardWidth = (horizontalTiles + 1) / 2 * tileSize
-        boardHeight = (verticalTiles + 1) / 2 * tileSize
+        boardWidth = horizontalTiles * tileSize
+        boardHeight = verticalTiles * tileSize
         pygame.draw.rect(screen, (20, 20, 50), ((width - boardWidth)/2, (height - boardHeight)/2, boardWidth, boardHeight))
+
+        for y, row in enumerate(board):
+            for x, cell in enumerate(row):
+                color = [min(255, 130 + 255*(cell == "0")), min(255, 130 + 255*(cell == "0")), min(255, 175 + 255*(cell == "0"))]
+                pygame.draw.rect(screen, color, [x * tileSize + (width - boardWidth)/2, y * tileSize + (height - boardHeight)/2, 2, 2])
+
+
 
         for event in pygame.event.get(): # checks if program is quit, if so stops the code
             if event.type == pygame.QUIT:
