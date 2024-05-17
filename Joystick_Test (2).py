@@ -53,6 +53,9 @@ def values(inputX, inputY):
     
 signal(SIGTERM, safe_exit)
 signal(SIGHUP, safe_exit)
+
+def giveButton():
+    return button1.is_pressed
 '''
 def close_everything():
     ledX.close()

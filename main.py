@@ -186,6 +186,7 @@ while running:
             button1Clicked = False
         
         if button1Clicked:
+            print(selected)
             if games[selected] == "Tetris":
                 home = False
                 tetris.run(screen)

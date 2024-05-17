@@ -45,8 +45,8 @@ def updateKeylog():
     elif not keylog[-1][0] == "-1":
         keylog.append(["-1", time.time()])
 
+    '''
     for direction in ["u", "r", "d", "l"]: # detects "double-moves" and if so updates the keylog
         if [item[0] for item in keylog[-3:]] == [direction, "-1", direction] and keylog[-1][1] - keylog[-3][1] < 0.5:
             keylog[-1][0] = direction + direction
-
-
+            '''
