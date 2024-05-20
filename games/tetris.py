@@ -3,12 +3,16 @@ import pygame
 import random
 import JSmanager as jsm
 import Joystick_Test as jst
+import copy
 
 ###### INITIALIZE ######
 width, height = 1024, 600
 windowSize = (width, height)
 fps = 60
 clock = pygame.time.Clock()
+
+pygame.init()
+font = pygame.font.Font("fonts/Retro Gaming.ttf", 32)
 
 jsm.keylog
 oldNews = False
@@ -54,8 +58,14 @@ shapes = [
 ]
 
 ###### OPERATOR FUNCTIONS ######
-def rotate(matrix):
-    return list(zip(*matrix[::-1]))
+def rotate(matrix, direction):
+    matrix1 = copy.deepcopy(matrix)
+    if direction == "r":
+        return list(zip(*matrix1[::-1]))
+    if direction == "l":
+        for i in range(3):
+            matrix1 = list(zip(*matrix1[::-1]))
+        return matrix1
 
 def cascade(highestStaticRow):
     global board
@@ -94,6 +104,8 @@ def run(screen):
     [board.append("..........") for row in range(verticalTiles)]
     tileSize = 25
     spawnNew = True
+    score = 0
+    pastRowsCleared = [0]
 
     while running:
         screen.fill((30, 30, 75))
@@ -106,52 +118,91 @@ def run(screen):
         boardHeight = verticalTiles * tileSize
         pygame.draw.rect(screen, (20, 20, 50), ((width - boardWidth)/2, (height - boardHeight)/2, boardWidth, boardHeight))
 
-        if waitIterator%20 == 0:
-            if spawnNew:
-                currentBlock = random.choice(shapes)
-                blockColumn = random.randint(0, horizontalTiles-3)
-                blockRow = 0
-                spawnNew = False
-            stamp(currentBlock, blockRow, blockColumn, True)
-            #cascade(verticalTiles - 1)
-            #print(jsm.keylog)
-            if jsm.keylog[-1][0] == "u" and not oldNews:
-                oldNews = True
-                currentBlock = rotate(currentBlock)
-            if jsm.keylog[-1][0] == "r" and not oldNews:
-                blockColumn = min(horizontalTiles-1, blockColumn + 1)
-                for row in range(len(currentBlock)):
-                    for index, cell in enumerate(currentBlock[row]):
-                        if cell == "0":
+        text = font.render("TETRIS", False, (255,255,255))
+        textR = ((20, 20), (text.get_rect()[2], text.get_rect()[3]))
+        screen.blit(text, textR)
+
+        text = font.render("SCORE", False, (255,255,255))
+        textR = ((width - 200 - text.get_rect()[2]/2, height/2 - 125 - text.get_rect()[3]/2), (text.get_rect()[2], text.get_rect()[3]))
+        screen.blit(text, textR)
+    
+        text = font.render(str(score), False, (255,255,255))
+        textR = ((width - 200 - text.get_rect()[2]/2, height/2 - 75 - text.get_rect()[3]/2), (text.get_rect()[2], text.get_rect()[3]))
+        screen.blit(text, textR)
+
+        text = font.render("MAX", False, (255,255,255))
+        textR = ((width - 200 - text.get_rect()[2]/2, height/2 + 75 - text.get_rect()[3]/2), (text.get_rect()[2], text.get_rect()[3]))
+        screen.blit(text, textR)
+    
+        text = font.render(str(score), False, (255,255,255))
+        textR = ((width - 200 - text.get_rect()[2]/2, height/2 + 125 - text.get_rect()[3]/2), (text.get_rect()[2], text.get_rect()[3]))
+        screen.blit(text, textR)
+        
+        if spawnNew:
+            currentBlock = random.choice(shapes)
+            blockColumn = random.randint(0, horizontalTiles-3)
+            blockRow = 0
+            spawnNew = False
+            numRowsCleared = 0
+            for rows in range(len(board)):
+                if board[rows] == "0000000000":
+                    cascade(rows)
+                    numRowsCleared += 1
+            if numRowsCleared > 0:
+                pastRowsCleared.append(numRowsCleared)
+                score += int(numRowsCleared**2 * 100 + (pastRowsCleared[-1] == pastRowsCleared[-2] == 4) * 400)
+
+        stamp(currentBlock, blockRow, blockColumn, True)
+        #cascade(verticalTiles - 1)
+        #print(jsm.keylog)
+        if jsm.keylog[-1][0] == "u" and not oldNews:
+            oldNews = True
+            currentBlock = rotate(currentBlock, "r")
+            for row in range(len(currentBlock)):
+                for index, cell in enumerate(currentBlock[row]):
+                    if cell == "0":
+                        failed = False
+                        if blockColumn + index >= horizontalTiles:
+                            blockColumn -= 1
+                        elif blockColumn + index < 0:
+                            blockColumn += 1
+                        elif board[blockRow + row][blockColumn + index] == "0":
+                            failed = True
+                            currentBlock = rotate(currentBlock, "l")
+        if jsm.keylog[-1][0] == "r" and not oldNews:
+            oldNews = True
+            blockColumn = blockColumn + 1
+            for row in range(len(currentBlock)):
+                for index, cell in enumerate(currentBlock[row]):
+                    if cell == "0":
+                        failed = True
+                        while failed == True:
                             if blockColumn + index >= horizontalTiles:
                                 failed = True
+                                blockColumn -= 1
                             elif board[blockRow + row][blockColumn + index] == "0":
                                 failed = True
-                if failed:
-                    blockColumn -= 1
-            if jsm.keylog[-1][0] == "l" and not oldNews:
-                blockColumn = max(0, blockColumn - 1)
-                for row in range(len(currentBlock)):
-                    for index, cell in enumerate(currentBlock[row]):
-                        if cell == "0":
+                                blockColumn -= 1
+                            else:
+                                failed = False
+        if jsm.keylog[-1][0] == "l" and not oldNews:
+            oldNews = True
+            blockColumn = blockColumn - 1
+            for row in range(len(currentBlock)):
+                for index, cell in enumerate(currentBlock[row]):
+                    if cell == "0":
+                        failed = True
+                        while failed == True:
                             if blockColumn + index < 0:
                                 failed = True
+                                blockColumn += 1
                             elif board[blockRow + row][blockColumn + index] == "0":
                                 failed = True
-                if failed:
-                    blockColumn += 1
-            if jsm.keylog[-1][0] == "d" and not oldNews:
-                blockRow += 1
-                failed = False
-                for row in range(len(currentBlock)):
-                    for index, cell in enumerate(currentBlock[row]):
-                        if cell == "0":
-                            if blockRow + row >= verticalTiles:
-                                failed = True
-                            elif board[blockRow + row][blockColumn + index] == "0":
-                                failed = True
-            if jsm.keylog[-1][0] == "-1":
-                oldNews = False
+                                blockColumn += 1
+                            else:
+                                failed = False
+        if jsm.keylog[-1][0] == "d" and not oldNews:
+            oldNews = True
             blockRow += 1
             failed = False
             for row in range(len(currentBlock)):
@@ -161,21 +212,46 @@ def run(screen):
                             failed = True
                         elif board[blockRow + row][blockColumn + index] == "0":
                             failed = True
-                        
             if failed:
                 blockRow -= 1
                 spawnNew = True
-            stamp(currentBlock, blockRow, blockColumn, False)
-            
+        if jsm.keylog[-1][0] == "-1":
+            oldNews = False
+        if waitIterator % 30 == 0:
+            blockRow += 1
+            failed = False
+        for row in range(len(currentBlock)):
+            for index, cell in enumerate(currentBlock[row]):
+                if cell == "0":
+                    failed = False
+                    if blockColumn + index >= horizontalTiles:
+                        failed = True
+                        blockColumn -= 1
+                    if blockColumn + index < 0:
+                        failed = True
+                        blockColumn += 1
+                    if blockRow + row >= verticalTiles:
+                        failed = True
+                        blockRow -= 1
+                        spawnNew = True
+                    if board[blockRow + row][blockColumn + index] == "0":
+                        failed = True
+                        blockRow -= 1
+                        spawnNew = True
 
+        stamp(currentBlock, blockRow, blockColumn, False)
         
         #if waitIterator%100 == 0:
             #stamp(random.choice(range(len(shapes))), 1, random.randint(0, horizontalTiles-3), False)
 
         for y, row in enumerate(board):
             for x, cell in enumerate(row):
-                color = [min(255, 35 + 255*(cell == "0")), min(255, 35 + 255*(cell == "0")), min(255, 85 + 255*(cell == "0"))]
-                pygame.draw.rect(screen, color, [x * tileSize + (width - boardWidth)/2, y * tileSize + (height - boardHeight)/2, tileSize, tileSize], 2)
+                if cell == "0":
+                    color = [min(255, 35 + 255*(cell == "0")), min(255, 35 + 255*(cell == "0")), min(255, 85 + 255*(cell == "0"))]
+                    pygame.draw.rect(screen, color, [x * tileSize + (width - boardWidth)/2, y * tileSize + (height - boardHeight)/2, tileSize, tileSize])
+                else:
+                    color = [min(255, 35 + 255*(cell == "0")), min(255, 35 + 255*(cell == "0")), min(255, 85 + 255*(cell == "0"))]
+                    pygame.draw.rect(screen, color, [x * tileSize + (width - boardWidth)/2, y * tileSize + (height - boardHeight)/2, tileSize, tileSize], 2)
 
         for event in pygame.event.get(): # checks if program is quit, if so stops the code
             if event.type == pygame.QUIT:
