@@ -1,0 +1,17 @@
+{
+    "games" : [
+        {
+            "TETRIS" : [
+                {"HIGHEST TETRIS SCORE" : 0},
+                {"GAMES PLAYED" : 0},
+                {"LONGEST TETRIS COMBO" : 0}
+            ]
+        },
+        {
+            "DANCE DANCE REVOLUTION" : [
+                {"HIGHEST SCORE" : 0},
+                {"FAVORITE SONG" : ""}
+            ]
+        }
+    ]
+}

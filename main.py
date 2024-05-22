@@ -7,6 +7,7 @@ import time
 from math import *
 import numpy as np
 import JSmanager as jsm
+import json
 
 from games import tetris
 
@@ -67,6 +68,9 @@ gamePics = [
     "images/Game7.png",
 ]
 
+data = json.load(open("stats.json"))
+stats = []
+
 background = pygame.image.load("images/Background2.png")
 background = pygame.transform.scale(background, windowSize)
 backgroundRect = background.get_rect()
@@ -116,19 +120,19 @@ while running:
 
         ### ON-SCREEN BUTTON LOOPS ###
         buttonPositions = []
-
-        centerX = 200
-        centerY = windowSize[1] / 2
-        chaseOffsetX += (rowOffsetX - chaseOffsetX) * 0.2
-        for index, game in enumerate(games): # loops through all of the games to draw the boxes
-            #pygame.draw.rect(screen, (255, 255, 255), (centerX - 152 + chaseOffsetX, centerY - 152, 304, 304), 2, border_radius=10)
-            gameCover = pygame.image.load(gamePics[index])
-            gameCoverRect = (centerX - 150 + chaseOffsetX, centerY - 150, 300, 300)
-            screen.blit(gameCover, gameCoverRect)
-            gameCover = None
-            gameCoverRect = None
-            buttonPositions.append((game, (centerX + chaseOffsetX, centerY)))
-            centerX += 320
+        if currentPage == "GAMES":
+            centerX = 200
+            centerY = windowSize[1] / 2
+            chaseOffsetX += (rowOffsetX - chaseOffsetX) * 0.2
+            for index, game in enumerate(games): # loops through all of the games to draw the boxes
+                #pygame.draw.rect(screen, (255, 255, 255), (centerX - 152 + chaseOffsetX, centerY - 152, 304, 304), 2, border_radius=10)
+                gameCover = pygame.image.load(gamePics[index])
+                gameCoverRect = (centerX - 150 + chaseOffsetX, centerY - 150, 300, 300)
+                screen.blit(gameCover, gameCoverRect)
+                gameCover = None
+                gameCoverRect = None
+                buttonPositions.append((game, (centerX + chaseOffsetX, centerY)))
+                centerX += 320
         centerX = 20
         centerY = windowSize[1] - 90
         for menuButton in menuButtons: # loops through all of the menu buttons to draw the boxes
@@ -179,17 +183,29 @@ while running:
         jsm.updateKeylog()
         
         if jst.giveButton() != oldClickStatus and oldClickStatus == False: # detects changes in the click status and makes updates accordingly
-            pygame.draw.circle(screen, (0, 0, 255), (int(windowSize[0]/2), int(windowSize[1]/2)), 500)
+            #pygame.draw.circle(screen, (0, 0, 255), (int(windowSize[0]/2), int(windowSize[1]/2)), 500)
             button1Clicked = True
         else:
             button1Clicked = False
-        
+
         if button1Clicked:
-            if selected < len(games):
-                if games[selected] == "Tetris":
-                    home = False
-                    tetris.run(screen)
-                    home = True
+            if currentPage == "GAMES":
+                if selected < len(games):
+                    if games[selected] == "Tetris":
+                        home = False
+                        tetris.run(screen)
+                        home = True
+                elif selected < len(games) + len(menuButtons) and menuButtons[selected - len(games)] != "GAMES":
+                    currentPage = menuButtons[selected - len(games)]
+                    selected = selected - len(games)
+            elif currentPage == "STATS":
+                if selected < len(stats) + len(menuButtons) and selected > len(stats) - 1:
+                    if menuButtons[selected] == "GAMES":
+                        selected = 7
+                        currentPage = "GAMES"
+                    #selected = selected - len(stats)
+            if selected == len(buttonPositions) - 1:
+                running = False
 
         clickStatus = jst.giveBackButton()
 
