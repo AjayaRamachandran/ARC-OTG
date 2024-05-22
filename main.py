@@ -178,7 +178,7 @@ while running:
         drawPoint(ssCoords) # draws a red point on the location of the joystick
         jsm.updateKeylog()
         
-        if jst.giveButton() != oldClickStatus and oldClickStatus == False: # detects changes in the click status and makes updates accordingly
+        if jst.giveBackButton() != oldClickStatus and oldClickStatus == False: # detects changes in the click status and makes updates accordingly
             pygame.draw.circle(screen, (0, 0, 255), (windowSize[0]/2, windowSize[1]/2), 500)
             button1Clicked = True
         else:
@@ -191,7 +191,7 @@ while running:
                     tetris.run(screen)
                     home = True
 
-        clickStatus = jst.giveButton()
+        clickStatus = jst.giveBackButton()
 
         if jsm.keylog[-1][0] != "-1" and not oldNews:
             oldNews = True # makes sure the command is only run once per joystick movement
