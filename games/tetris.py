@@ -313,6 +313,8 @@ def run(screen):
                 running = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 running = False
+        if jst.giveBackButton():
+            running = False
 
         drawPoint(ssCoords) # draws a red point on the location of the joystick
         # runs framerate wait time

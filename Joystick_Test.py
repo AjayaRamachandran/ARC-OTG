@@ -25,3 +25,9 @@ def giveCoords():
 
 def giveButton():
     return pygame.mouse.get_pressed()[0]
+
+def giveBackButton():
+    if pygame.key.get_pressed()[pygame.K_BACKSPACE]:
+        return True
+    else:
+        return False
