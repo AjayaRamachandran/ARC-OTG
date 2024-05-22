@@ -16,6 +16,7 @@ font = pygame.font.Font("fonts/Retro Gaming.ttf", 32)
 
 jsm.keylog
 oldNews = False
+buttonNews = False
 
 board = []
 
@@ -85,6 +86,7 @@ def stamp(shape, row, column, erase):
                     #board[row + srIndex][column + scIndex] = "."
                     board[row + srIndex] = board[row + srIndex][:column + scIndex] + "0" + board[row + srIndex][column + scIndex + 1:]
 
+
 ###### MAINLOOP ######      
 def run(screen):
     def jsToSS(jsCoords): # function to converts joystick coordinates (-128, 128) to screen space coordinates
@@ -94,19 +96,29 @@ def run(screen):
     def drawPoint(SScoords):
         pygame.draw.circle(screen, (255, 0, 0), SScoords, 4)
 
-    global board, boardWidth, boardHeight, tileSize, horizontalTiles, verticalTiles
+    global board, boardWidth, boardHeight, tileSize, horizontalTiles, verticalTiles, oldNews, buttonNews, running, waitIterator, spawnNew, score, pastRowsCleared, frameTime, nextBlock, holdPiece
 
-    waitIterator = 0
-    running = True
-    horizontalTiles = 10
-    verticalTiles = 20
-    board = []
-    [board.append("..........") for row in range(verticalTiles)]
-    tileSize = 25
-    spawnNew = True
-    score = 0
-    pastRowsCleared = [0]
+    def resetGame():
+        global board, boardWidth, boardHeight, tileSize, horizontalTiles, verticalTiles, oldNews, buttonNews, running, waitIterator, spawnNew, score, pastRowsCleared, frameTime, nextBlock, holdPiece
+        waitIterator = 0
+        running = True
+        horizontalTiles = 10
+        verticalTiles = 20
+        board = []
+        [board.append("..........") for row in range(verticalTiles)]
+        tileSize = 25
+        spawnNew = True
+        score = 0
+        pastRowsCleared = [0]
+        frameTime = 3000
+        nextBlock = random.choice(shapes)
+        holdPiece = []
+        buttonNews = True
 
+    def endGame():
+        resetGame()
+
+    resetGame()
     while running:
         screen.fill((30, 30, 75))
         jsCoords = jst.giveCoords() # retrieves the input coordinates from the relevant module
@@ -137,9 +149,19 @@ def run(screen):
         text = font.render(str(score), False, (255,255,255))
         textR = ((width - 200 - text.get_rect()[2]/2, height/2 + 125 - text.get_rect()[3]/2), (text.get_rect()[2], text.get_rect()[3]))
         screen.blit(text, textR)
+
+        text = font.render("NEXT", False, (255,255,255))
+        textR = ((200 - text.get_rect()[2]/2, height/2 - 140 - text.get_rect()[3]/2), (text.get_rect()[2], text.get_rect()[3]))
+        screen.blit(text, textR)
+
+        text = font.render("HOLD", False, (255,255,255))
+        textR = ((200 - text.get_rect()[2]/2, height/2 + 60 - text.get_rect()[3]/2), (text.get_rect()[2], text.get_rect()[3]))
+        screen.blit(text, textR)
         
         if spawnNew:
-            currentBlock = random.choice(shapes)
+            currentBlock = nextBlock
+            nextBlock = random.choice(shapes)
+            
             blockColumn = random.randint(0, horizontalTiles-3)
             blockRow = 0
             spawnNew = False
@@ -215,11 +237,22 @@ def run(screen):
             if failed:
                 blockRow -= 1
                 spawnNew = True
+        if jst.giveButton() and not buttonNews:
+            buttonNews = True
+            if holdPiece == []:
+                holdPiece = currentBlock
+                currentBlock = nextBlock
+            else:
+                currentBlock, holdPiece = holdPiece, currentBlock
+        elif not jst.giveButton():
+            buttonNews = False
+
         if jsm.keylog[-1][0] == "-1":
             oldNews = False
-        if waitIterator % 30 == 0:
+        if waitIterator % (round(frameTime/100)) == 0:
             blockRow += 1
             failed = False
+            frameTime = max(1000, frameTime - 1)
         for row in range(len(currentBlock)):
             for index, cell in enumerate(currentBlock[row]):
                 if cell == "0":
@@ -240,7 +273,9 @@ def run(screen):
                         spawnNew = True
 
         stamp(currentBlock, blockRow, blockColumn, False)
-        
+        if spawnNew:
+            if board[2] != "..........":
+                endGame()       
         #if waitIterator%100 == 0:
             #stamp(random.choice(range(len(shapes))), 1, random.randint(0, horizontalTiles-3), False)
 
@@ -252,6 +287,26 @@ def run(screen):
                 else:
                     color = [min(255, 35 + 255*(cell == "0")), min(255, 35 + 255*(cell == "0")), min(255, 85 + 255*(cell == "0"))]
                     pygame.draw.rect(screen, color, [x * tileSize + (width - boardWidth)/2, y * tileSize + (height - boardHeight)/2, tileSize, tileSize], 2)
+        
+        for y, row in enumerate(nextBlock):
+            for x, cell in enumerate(row):
+                if cell == "0":
+                    color = [min(255, 35 + 255*(cell == "0")), min(255, 35 + 255*(cell == "0")), min(255, 85 + 255*(cell == "0"))]
+                    pygame.draw.rect(screen, color, [(x - ((len(nextBlock))/2)) * tileSize + 200, (y - ((len(row))/2)) * tileSize + (height)/2 - 60, tileSize, tileSize])
+                else:
+                    color = [min(255, 35 + 255*(cell == "0")), min(255, 35 + 255*(cell == "0")), min(255, 85 + 255*(cell == "0"))]
+                    pygame.draw.rect(screen, color, [(x - ((len(nextBlock))/2)) * tileSize + 200, (y - ((len(row))/2)) * tileSize + (height)/2 - 60, tileSize, tileSize], 2)
+
+        for y, row in enumerate(holdPiece):
+            for x, cell in enumerate(row):
+                if cell == "0":
+                    color = [min(255, 35 + 255*(cell == "0")), min(255, 35 + 255*(cell == "0")), min(255, 85 + 255*(cell == "0"))]
+                    pygame.draw.rect(screen, color, [(x - ((len(holdPiece))/2)) * tileSize + 200, (y - ((len(row))/2)) * tileSize + (height)/2 + 140, tileSize, tileSize])
+                else:
+                    color = [min(255, 35 + 255*(cell == "0")), min(255, 35 + 255*(cell == "0")), min(255, 85 + 255*(cell == "0"))]
+                    pygame.draw.rect(screen, color, [(x - ((len(holdPiece))/2)) * tileSize + 200, (y - ((len(row))/2)) * tileSize + (height)/2 + 140, tileSize, tileSize], 2)
+        
+        pygame.draw.line(screen, (255,0,0), ((width-boardWidth)/2, 3 * tileSize + (height - boardHeight)/2), ((width+boardWidth)/2, 3 * tileSize + (height - boardHeight)/2), 4)
 
         for event in pygame.event.get(): # checks if program is quit, if so stops the code
             if event.type == pygame.QUIT:

@@ -103,7 +103,6 @@ def drawTestBG():
     pygame.draw.circle(screen, (50, 50, 50), jsToSS((0,0)), 5) # center of graph point
     pygame.draw.circle(screen, (255, 255, 255), jsToSS((0, 0)), 128, 1) # large boundary circle
 
-
 ###### MAINLOOP ######
 
 running = True # Runs the game loop
@@ -186,11 +185,11 @@ while running:
             button1Clicked = False
         
         if button1Clicked:
-            print(selected)
-            if games[selected] == "Tetris":
-                home = False
-                tetris.run(screen)
-                home = True
+            if selected < len(games):
+                if games[selected] == "Tetris":
+                    home = False
+                    tetris.run(screen)
+                    home = True
 
         clickStatus = jst.giveButton()
 
