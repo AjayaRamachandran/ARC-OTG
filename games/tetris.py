@@ -316,7 +316,7 @@ def run(screen):
         if jst.giveBackButton():
             running = False
 
-        drawPoint(ssCoords) # draws a red point on the location of the joystick
+        #drawPoint(ssCoords) # draws a red point on the location of the joystick
         # runs framerate wait time
         clock.tick(fps)
         # update the screen

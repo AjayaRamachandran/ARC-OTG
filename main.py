@@ -10,6 +10,7 @@ import JSmanager as jsm
 import json
 
 from games import tetris
+from games import ssr
 
 ###### SETUP ######
 
@@ -50,9 +51,9 @@ menuButtons = [
 
 games = [
     "Tetris",
+    "Swipe Swipe Revolution",
     "Galaga",
     "Turrican",
-    "Dance Dance Revolution",
     "Terraria",
     "Mariokart",
     "Poly Bridge"
@@ -89,7 +90,7 @@ def dir(point1, point2): # calculates the direction between one point and anothe
 
 def jsToSS(jsCoords): # function to converts joystick coordinates (-128, 128) to screen space coordinates
     jX, jY = jsCoords[0], jsCoords[1]
-    x, y = -jX + windowSize[0]/2, jY + windowSize[1]/2
+    x, y = jX + windowSize[0]/2, jY + windowSize[1]/2
     return (int(x), int(y))
 
 def drawPoint(SScoords):
@@ -195,6 +196,10 @@ while running:
                         home = False
                         tetris.run(screen)
                         home = True
+                    if games[selected] == "Swipe Swipe Revolution":
+                        home = False
+                        ssr.run(screen)
+                        home = True
                 elif selected < len(games) + len(menuButtons) and menuButtons[selected - len(games)] != "GAMES":
                     currentPage = menuButtons[selected - len(games)]
                     selected = selected - len(games)
@@ -211,7 +216,7 @@ while running:
 
         if jsm.keylog[-1][0] != "-1" and not oldNews:
             oldNews = True # makes sure the command is only run once per joystick movement
-            unitMousePos = [-cos(dir((0,0), jsCoords)), sin(dir((0,0), jsCoords))]
+            unitMousePos = [cos(dir((0,0), jsCoords)), sin(dir((0,0), jsCoords))]
             branchDistances = []
             for relation in acceptedRelations:
                 branchDistances.append((dist(unitMousePos, (cos(relation[1]), sin(relation[1]))), relation[2]))

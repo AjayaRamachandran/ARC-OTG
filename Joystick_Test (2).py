@@ -14,7 +14,7 @@ valueX = 128
 valueY = 128
 
 def giveCoords():
-    return [(read_ads7830(0) - 128) * bool(abs(read_ads7830(0) - 128) > 10), (-read_ads7830(1) + 128) * bool(abs(-read_ads7830(1) + 128) > 10)]
+    return [(-read_ads7830(0) + 128) * bool(abs(-read_ads7830(0) + 128) > 10), (-read_ads7830(1) + 128) * bool(abs(-read_ads7830(1) + 128) > 10)]
 
 ads7830_commands = [0x84, 0xc4, 0x94, 0xd4, 0xa4, 0xe4, 0xb4, 0xf4]
 def read_ads7830(input):
