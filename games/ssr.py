@@ -56,17 +56,34 @@ def run(screen):
         trueUserSlot = (abs(centeredMouseX) > 50) * ((centeredMouseX > 0) - 0.5) * 2 * 100 + width/2
         chaseUserSlot += (trueUserSlot - chaseUserSlot) * 0.3
         
-        if waitIterator % 10 == 0:
+        if waitIterator % 20 == 0:
             lane = random.choice([width/2 - 100, width/2, width/2 + 100])
             arrowsOnScreen.append([lane, 100])
         
         cascade()
 
         for arrow in arrowsOnScreen:
-            if arrow[1] > height - 100:
+            if height - 80 > arrow[1] > height - 100 and arrow[0] == trueUserSlot:
                 arrowsOnScreen.remove(arrow)
+            if arrow[1] > height + 20:
+                arrowsOnScreen.remove(arrow)
+
+        for arrow in arrowsOnScreen:
             ypos = -80000 / (arrow[1] - 650) - 80
-            pygame.draw.circle(screen, [255,255,255], (width/2 + ((arrow[0] - width/2) * (-80000 / (arrow[1] - 650)) / (height - 100)), ypos), ypos / 10)
+            #pygame.draw.circle(screen, [255,255,255], (width/2 + ((arrow[0] - width/2) * (-80000 / (arrow[1] - 650)) / (height - 100)), ypos), ypos / 10)
+            if arrow[0] == width/2 - 100:
+                newleft = pygame.transform.scale(left, (ypos / 5 + 5, ypos / 5 + 5))
+                left_rect = ((width/2 + ((arrow[0] - width/2) * (-80000 / (arrow[1] - 650)) / (height - 100)) - ypos/10, ypos - ypos/10), (ypos / 5, ypos / 5))
+                screen.blit(newleft, left_rect)
+            if arrow[0] == width/2:
+                newup = pygame.transform.scale(up, (ypos / 5 + 5, ypos / 5 + 5))
+                up_rect = ((width/2 + ((arrow[0] - width/2) * (-80000 / (arrow[1] - 650)) / (height - 100)) - ypos/10, ypos - ypos/10), (ypos / 5, ypos / 5))
+                screen.blit(newup, up_rect)
+            if arrow[0] == width/2 + 100:
+                newright = pygame.transform.scale(right, (ypos / 5 + 5, ypos / 5 + 5))
+                right_rect = ((width/2 + ((arrow[0] - width/2) * (-80000 / (arrow[1] - 650)) / (height - 100)) - ypos/10, ypos - ypos/10), (ypos / 5, ypos / 5))
+                screen.blit(newright, right_rect)
+
 
         pygame.draw.circle(screen, [255,255,0], (chaseUserSlot, height-100), 10)
         for event in pygame.event.get(): # checks if program is quit, if so stops the code
