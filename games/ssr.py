@@ -20,6 +20,10 @@ buttonNews = False
 
 arrowsOnScreen = []
 
+up = pygame.image.load("images/SSRUp.png")
+right = pygame.image.load("images/SSRRight.png")
+left = pygame.image.load("images/SSRLeft.png")
+
 ###### FUNCTIONS ######
 def cascade():
     for arrow in arrowsOnScreen:
@@ -61,7 +65,8 @@ def run(screen):
         for arrow in arrowsOnScreen:
             if arrow[1] > height - 100:
                 arrowsOnScreen.remove(arrow)
-            pygame.draw.circle(screen, [255,255,255], (width/2 + ((arrow[0] - width/2) * (-80000 / (arrow[1] - 650)) / (height - 100)), -80000 / (arrow[1] - 650) - 80), round(-20000 / (arrow[1] - 650)) - 80)
+            ypos = -80000 / (arrow[1] - 650) - 80
+            pygame.draw.circle(screen, [255,255,255], (width/2 + ((arrow[0] - width/2) * (-80000 / (arrow[1] - 650)) / (height - 100)), ypos), ypos / 10)
 
         pygame.draw.circle(screen, [255,255,0], (chaseUserSlot, height-100), 10)
         for event in pygame.event.get(): # checks if program is quit, if so stops the code
