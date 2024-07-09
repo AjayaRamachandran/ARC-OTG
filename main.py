@@ -11,6 +11,7 @@ import json
 
 from games import tetris
 from games import ssr
+from games import minigolf
 
 ###### SETUP ######
 
@@ -51,12 +52,12 @@ menuButtons = [
 
 games = [
     "Tetris",
+    "Mini Golf",
     "Swipe Swipe Revolution",
     "Galaga",
     "Turrican",
     "Terraria",
-    "Mariokart",
-    "Poly Bridge"
+    "Mariokart"
 ]
 
 gamePics = [
@@ -127,6 +128,7 @@ while running:
             chaseOffsetX += (rowOffsetX - chaseOffsetX) * 0.2
             for index, game in enumerate(games): # loops through all of the games to draw the boxes
                 #pygame.draw.rect(screen, (255, 255, 255), (centerX - 152 + chaseOffsetX, centerY - 152, 304, 304), 2, border_radius=10)
+                print(index)
                 gameCover = pygame.image.load(gamePics[index])
                 gameCoverRect = (centerX - 150 + chaseOffsetX, centerY - 150, 300, 300)
                 screen.blit(gameCover, gameCoverRect)
@@ -199,6 +201,10 @@ while running:
                     if games[selected] == "Swipe Swipe Revolution":
                         home = False
                         ssr.run(screen)
+                        home = True
+                    if games[selected] == "Mini Golf":
+                        home = False
+                        minigolf.run(screen)
                         home = True
                 elif selected < len(games) + len(menuButtons) and menuButtons[selected - len(games)] != "GAMES":
                     currentPage = menuButtons[selected - len(games)]
