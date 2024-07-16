@@ -128,7 +128,7 @@ while running:
             chaseOffsetX += (rowOffsetX - chaseOffsetX) * 0.2
             for index, game in enumerate(games): # loops through all of the games to draw the boxes
                 #pygame.draw.rect(screen, (255, 255, 255), (centerX - 152 + chaseOffsetX, centerY - 152, 304, 304), 2, border_radius=10)
-                print(index)
+                #print(index)
                 gameCover = pygame.image.load(gamePics[index])
                 gameCoverRect = (centerX - 150 + chaseOffsetX, centerY - 150, 300, 300)
                 screen.blit(gameCover, gameCoverRect)
