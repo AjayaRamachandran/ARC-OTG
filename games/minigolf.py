@@ -28,6 +28,17 @@ edgeRule = [
     [1, 1], [10, 10]
 ]
 
+kernel = [
+    [-1, 1],
+    [0, 1],
+    [1, 1],
+    [-1, 0],
+    [1, 0],
+    [-1, -1],
+    [0, -1],
+    [1, -1],
+]
+
 ###### FUNCTIONS ######
 def generateLevel(width, length, roomSize, iterations):
     level = []
@@ -107,9 +118,17 @@ def generateLevel(width, length, roomSize, iterations):
                     newGeneratedLevel[outerIndex].append(generatedLevel[outerIndex][index])
             newGeneratedLevel[outerIndex].append(generatedLevel[outerIndex][index])
 
+    for row in range(len(smallLevel)):
+        for cell in range(len(smallLevel[i])):
+            border = 0
+            for item in kernel:
+                if item[0] + row >= 0 and item[0] + row <= len(smallLevel[i]) - 1 and item[1] + cell >= 0 and item[1] + cell <= len(smallLevel) - 1:
+                    if smallLevel[item[0] + row][item[1] + cell] == "0" and smallLevel[row][cell] == ".":
+                        border = 1
+            if border == 1:
+                smallLevel[row][cell] = "1"
+        print(smallLevel[row])
 
-    for i in smallLevel:
-        print(i)
     image = Image.new("RGBA", (len(newGeneratedLevel[0]), len(newGeneratedLevel)))
     for y, row in enumerate(newGeneratedLevel):
         for x, pixel in enumerate(row):
@@ -133,7 +152,6 @@ def run(screen):
 
     level = generateLevel(5, 5, 3, random.randint(5,10))
         
-
     running = True
 
     while running:
@@ -149,8 +167,10 @@ def run(screen):
                 dimensions = [edgeRule[edgeRule.index([cell%2, row%2]) + 1][a] * 5 for a in range(2)]
                 if level[row][cell] == "0":
                     pygame.draw.rect(screen, [40, 90, 40], [position, dimensions])
-                if level[row][cell] == ".":
+                if level[row][cell] == "1":
                     pygame.draw.rect(screen, [255, 255, 255], [position, dimensions])
+                if level[row][cell] == ".":
+                    None
                 position[0] += dimensions[0]
                 #position[0] += 60
             position[1] += dimensions[1]
