@@ -39,6 +39,20 @@ kernel = [
     [1, -1],
 ]
 
+balls = []
+
+###### VARIABLES ######
+class Ball():
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        balls.append(self)
+
+    def move(self, x, y):
+        self.x = x
+        self.y = y
+
+
 ###### FUNCTIONS ######
 def generateLevel(width, length, roomSize, iterations):
     level = []
@@ -151,7 +165,8 @@ def run(screen):
         pygame.draw.circle(screen, (255, 0, 0), SScoords, 4)
 
     level = generateLevel(5, 5, 3, random.randint(5,10))
-        
+    player = Ball(x = 50, y = 50)
+
     running = True
 
     while running:
@@ -176,6 +191,10 @@ def run(screen):
             position[1] += dimensions[1]
             #position[1] += 60
 
+
+        for ball in balls:
+            pygame.draw.circle(screen, (10,30,10), (ball.x + 4, ball.y + 4), 8)
+            pygame.draw.circle(screen, (255,255,255), (ball.x, ball.y), 8)
         for event in pygame.event.get(): # checks if program is quit, if so stops the code
             if event.type == pygame.QUIT:
                 running = False
